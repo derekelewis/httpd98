@@ -2,6 +2,8 @@
 #include "request.h"
 #include "request_parser.h"
 
+#include <algorithm>
+
 Request RequestParser::ParseRequest(const std::string &request_string) {
     Request request;
     
@@ -68,9 +70,10 @@ Request RequestParser::ParseRequest(const std::string &request_string) {
             request.state_ = Request::MALFORMED;
             return request;
         }
-        // TODO: make key names lowercase
+
         // TODO: fix colon parsing to allow for empty value headers or no space after colon
         std::string prop_key = request_string.substr(start, (colon_pos - start));
+        std::transform(prop_key.begin(), prop_key.end(), prop_key.begin(), ::tolower);
         std::string prop_value = request_string.substr(colon_pos + 2, (end - colon_pos) - 2);
         request.headers_.insert(std::pair<std::string, std::string>(prop_key, prop_value));
 
