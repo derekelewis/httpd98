@@ -22,7 +22,9 @@ void Worker::Execute(int conn) {
     RequestParser request_parser;
     Request request = request_parser.ParseRequest(request_string);
     if (request.state() == Request::MALFORMED) {
-        // TODO: return 400 response
+        Response response = Response(http::HTTP_400, "<html>Bad Request</html>");
+        std::string response_string = response.serialize();
+        write(conn, response_string.data(), response_string.size());
         close(conn);
         return;
     }
