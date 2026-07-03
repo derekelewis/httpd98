@@ -12,7 +12,10 @@ void Worker::Execute(int conn) {
 
     std::string request_string = "";
     ssize_t bytes_read = 0;
-    while((bytes_read = read(conn, buf, sizeof(buf))) > 0) {
+    while(((bytes_read = read(conn, buf, sizeof(buf))) > 0) || (bytes_read == -1 && errno == EINTR)) {
+        if (bytes_read <= 0) {
+            continue; // continue on EINTR
+        }
         request_string.append(buf, bytes_read);
         if (request_string.find("\r\n\r\n") != std::string::npos) break;
     }
