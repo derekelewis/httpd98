@@ -11,6 +11,8 @@
 #include "response.h"
 #include "worker.h"
 
+#define BACKLOG 4096
+
 int main(void) {
 
     int sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
@@ -37,7 +39,7 @@ int main(void) {
         return 1;
     }
 
-    if (listen(sock, 10) != 0) {
+    if (listen(sock, BACKLOG) != 0) {
         std::cerr << "listen failed: " << strerror(errno) << "\n";
         return 1;
     }
