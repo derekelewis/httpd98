@@ -6,12 +6,10 @@
 #include <iostream>
 #include <errno.h>
 #include <unistd.h>
-#include <string.h>
 
 void Worker::Execute(int conn) {
     char buf[128];
 
-    std::cout << "connection accepted\n";
     std::string request_string = "";
     ssize_t bytes_read = 0;
     while((bytes_read = read(conn, buf, sizeof(buf))) > 0) {
