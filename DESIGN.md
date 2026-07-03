@@ -1,6 +1,6 @@
 # Design Decisions
 
-- Focus is on maintaining C++98 compatibility to learn more about the idioms and constraints of the timeframe. May clone this project in the future and modernize the C++98 codebase to C++23 or C++26. 
+- Focus is on maintaining C++98 compatibility to learn more about the idioms and constraints of the timeframe. May clone this project in the future and modernize the C++98 codebase to C++23 or C++26.
 - Single-process today until request/response flow can be fully demonstrated; will change to `fork` later and as we approach the C10k challenge, then we can switch to `epoll` or some other similar method of concurrency.
 
 ## Request parsing and error handling
@@ -25,6 +25,10 @@
 - Reason phrases ("OK", "Bad Request") are a pure function of the status code, provided by `http::status_code_phrase` in http.cc rather than stored per response.
 - `http::StatusCode` covers the codes a basic server plausibly emits (200, 400, 403, 404, 405, 500, 501, 505); further codes are added when a code path actually produces them.
 - `http::status_code_phrase` is a no-default `switch` over the enum, so `-Wswitch` (enabled by `-Wall`) flags any enumerator added without a corresponding phrase. The `return "Unknown"` after the switch handles a value cast into the enum from outside its range and deliberately does not impersonate a real reason phrase.
+
+# Concurrency
+- Implemented concurrency via `fork`. 
+- `Worker::Execute` handles request processing in the child. Currently, in a class, as we may decide to add state to `Worker` eventually. An argument can be made for getting rid of the class and extracting `Execute` to a free function. 
 
 # TBD/In-progress
 

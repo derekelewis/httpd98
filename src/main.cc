@@ -4,10 +4,12 @@
 #include <unistd.h>
 #include <string.h>
 #include <errno.h>
+#include <signal.h>
 
 #include "request.h"
 #include "request_parser.h"
 #include "response.h"
+#include "worker.h"
 
 int main(void) {
 
@@ -44,45 +46,36 @@ int main(void) {
     socklen_t len = sizeof(peer);
 
     int conn;
-    char buf[128];
+    pid_t pid;
+
+    // TODO: implement real signal handlers
+    signal(SIGCHLD, SIG_IGN);
+    signal(SIGPIPE, SIG_IGN);
 
     for(;;) {
         len = sizeof(peer);
         conn = accept(sock, reinterpret_cast<sockaddr *>(&peer), &len);
+
         if (conn == -1) {
             // TODO: do more handling here based on errno
             std::cerr << "accept failed: " << strerror(errno) << "\n";
             continue;
         }
 
-        std::cout << "connection accepted\n";
-        std::string request_string = "";
-        ssize_t bytes_read = 0;
-        while((bytes_read = read(conn, buf, sizeof(buf))) > 0) {
-            request_string.append(buf, bytes_read);
-            if (request_string.find("\r\n\r\n") != std::string::npos) break;
+        if ((pid = fork()) == 0) {
+            close(sock);
+            Worker worker;
+            worker.Execute(conn);
+            // we assume Execute() handles all closes of conn before returning
+            _exit(0);
         }
-        RequestParser request_parser;
-        Request request = request_parser.ParseRequest(request_string);
-        if (request.state() == Request::MALFORMED) {
-            // TODO: return 400 response
-            close(conn);
-            continue;
+
+        if (pid == -1) {
+            // TODO: do more error handling here; generate response?
+            std::cerr << "fork failed: " << strerror(errno) << "\n";
         }
-        // TODO: return actual response
-        switch (request.method()) {
-            case http::GET: {
-                std::string body = "<html><body>hello, world!</body></html>";
-                Response response = Response(http::HTTP_200, body);
-                std::string response_string = response.serialize();
-                write(conn, response_string.data(), response_string.size());
-                close(conn);
-                break;
-            }
-            default:
-                // unimplemented
-                close(conn);
-        }
+
+        close(conn);
     }
 
     return 0;
