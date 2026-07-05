@@ -6,7 +6,7 @@ all:
 	$(CXX) $(CXXFLAGS) $(LIB_SRC) src/main.cc -o httpd98
 
 tests:
-	$(CXX) $(CXXFLAGS) -Isrc $(LIB_SRC) test/* -o run_tests
+	$(CXX) $(CXXFLAGS) -Isrc $(LIB_SRC) test/*.cc -o run_tests
 	./run_tests
 
 clean:
