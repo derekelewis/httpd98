@@ -4,6 +4,25 @@
 
 #include <algorithm>
 
+#define WHITESPACE " \n\r\t\f\v"
+
+static void ltrim(std::string &str) {
+    std::size_t idx;
+    idx = str.find_first_not_of(WHITESPACE);
+    str.erase(0, idx);
+}
+
+static void rtrim(std::string &str) {
+    std::size_t idx;
+    idx = str.find_last_not_of(WHITESPACE);
+    str.erase(idx + 1);
+}
+
+static void trim(std::string &str) {
+    ltrim(str);
+    rtrim(str);
+}
+
 Request RequestParser::ParseRequest(const std::string &request_string) {
     Request request;
     
@@ -71,10 +90,11 @@ Request RequestParser::ParseRequest(const std::string &request_string) {
             return request;
         }
 
-        // TODO: fix colon parsing to allow for empty value headers or no space after colon
         std::string prop_key = request_string.substr(start, (colon_pos - start));
+        trim(prop_key);
         std::transform(prop_key.begin(), prop_key.end(), prop_key.begin(), ::tolower);
-        std::string prop_value = request_string.substr(colon_pos + 2, (end - colon_pos) - 2);
+        std::string prop_value = request_string.substr(colon_pos + 1, (end - colon_pos) + 1);
+        trim(prop_value);
         request.headers_.insert(std::pair<std::string, std::string>(prop_key, prop_value));
 
         start = end + 2;
