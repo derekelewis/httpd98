@@ -10,5 +10,5 @@ tests:
 	./run_tests
 
 clean:
-	rm httpd98
-	rm run_tests
+	rm -f httpd98
+	rm -f run_tests
