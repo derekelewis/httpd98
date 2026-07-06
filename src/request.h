@@ -11,7 +11,8 @@ public:
     http::Method method() const;
     http::Path path() const;
     State state() const;
-    http::Headers headers() const;
+    const http::Headers &headers() const;
+    const std::string &header(const std::string &header) const;
 private:
     friend class RequestParser;
     http::Method method_;
