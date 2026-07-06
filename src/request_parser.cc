@@ -93,7 +93,7 @@ Request RequestParser::ParseRequest(const std::string &request_string) {
         std::string prop_key = request_string.substr(start, (colon_pos - start));
         trim(prop_key);
         std::transform(prop_key.begin(), prop_key.end(), prop_key.begin(), ::tolower);
-        std::string prop_value = request_string.substr(colon_pos + 1, (end - colon_pos) + 1);
+        std::string prop_value = request_string.substr(colon_pos + 1, end - colon_pos - 1);
         trim(prop_value);
         request.headers_.insert(std::pair<std::string, std::string>(prop_key, prop_value));
 
