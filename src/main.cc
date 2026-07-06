@@ -6,6 +6,7 @@
 #include <errno.h>
 #include <signal.h>
 
+#include "configuration.h"
 #include "request.h"
 #include "request_parser.h"
 #include "response.h"
@@ -13,7 +14,32 @@
 
 #define BACKLOG 4096
 
-int main(void) {
+static Configuration LoadConfiguration(const std::string &path);
+
+int main(int argc, char *argv[]) {
+
+    std::string config_path;
+
+    if (argc > 1) {
+        for (int i = 1; i < argc; ++i) {
+            if (std::string(argv[i]) == "-f") {
+                if (i + 1 >= argc) {
+                    std::cerr << "-f requires a file path\n";
+                    return 1;
+                }
+                config_path = argv[++i];
+            } else {
+                std::cerr << "Invalid configuration file path specified\n";
+                return 1;
+            }
+        }
+    }
+
+    Configuration configuration = LoadConfiguration(config_path);
+    if (configuration.state() != Configuration::COMPLETE) {
+        std::cerr << configuration.message() << "\n";
+        return 1;
+    }
 
     int sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 
@@ -31,7 +57,7 @@ int main(void) {
     sockaddr_in sa;
     bzero(&sa, sizeof(sa));
     sa.sin_family = AF_INET;
-    sa.sin_port = htons(8080);
+    sa.sin_port = htons(configuration.port());
     sa.sin_addr.s_addr = htonl(INADDR_ANY);
 
     if (bind(sock, reinterpret_cast<sockaddr *>(&sa), sizeof(sa)) != 0) {
@@ -81,4 +107,11 @@ int main(void) {
     }
 
     return 0;
+}
+
+static Configuration LoadConfiguration(const std::string &path) {
+    if (!path.empty()) return Configuration::FromFile(path);
+
+    std::cout << "No configuration specified. Using default configuration.\n";
+    return Configuration::FromString("DocumentRoot .\nPort 8080\n");
 }

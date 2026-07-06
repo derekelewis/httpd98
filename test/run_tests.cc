@@ -2,6 +2,7 @@
 
 #include "request.h"
 #include "request_parser.h"
+#include "configuration_tests.h"
 
 int g_failures = 0;
 
@@ -23,6 +24,7 @@ static void test_empty_header_value() {
 int main(void) {
     test_no_space_after_colon();
     test_empty_header_value();
+    run_configuration_tests();
     if (g_failures == 0) { std::printf("all tests passed\n"); return 0; }
     std::printf("%d failure(s)\n", g_failures);
     return 1;
