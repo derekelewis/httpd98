@@ -46,8 +46,6 @@ Configuration Configuration::FromString(const std::string &text)
     }
     configuration.document_root_ = text.substr(start + 1, end - start - 1);
 
-    start = end + 1;
-
     // TODO: need more validation
     // Find Port
     start = text.find("Port");
