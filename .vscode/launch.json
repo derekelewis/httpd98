@@ -29,7 +29,7 @@
             "program": "${workspaceFolder}/run_tests",
             "cwd": "${workspaceFolder}",
             "MIMode": "gdb",
-            "preLaunchTask": "build",
+            "preLaunchTask": "build tests",
             "stopAtEntry": false,
             "linux": {
                 "MIMode": "gdb",
