@@ -5,7 +5,7 @@ http::Method Request::method() const
     return method_;
 }
 
-http::Path Request::path() const
+const http::Path &Request::path() const
 {
     return path_;
 }

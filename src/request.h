@@ -9,7 +9,7 @@ public:
     enum State { PENDING, COMPLETE, INCOMPLETE, MALFORMED };
     Request() : method_(http::UNKNOWN), state_(PENDING) {}
     http::Method method() const;
-    http::Path path() const;
+    const http::Path &path() const;
     State state() const;
     const http::Headers &headers() const;
     const std::string &header(const std::string &header) const;
