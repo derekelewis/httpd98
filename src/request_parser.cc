@@ -23,7 +23,7 @@ static void trim(std::string &str) {
     rtrim(str);
 }
 
-Request RequestParser::ParseRequest(const std::string &request_string) {
+Request RequestParser::ParseRequest(const std::string &request_string) const {
     Request request;
     
     std::size_t start, end;

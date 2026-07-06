@@ -4,7 +4,7 @@
 
 class RequestParser {
 public:
-    Request ParseRequest(const std::string &request);
+    Request ParseRequest(const std::string &request) const;
 };
 
 #endif
