@@ -4,8 +4,6 @@
 #include <map>
 #include <string>
 
-
-
 namespace http {
     typedef std::map<std::string, std::string> Headers;
     typedef std::string Path;
@@ -20,7 +18,14 @@ namespace http {
         HTTP_501 = 501,
         HTTP_505 = 505
     };
-    std::string status_code_phrase(StatusCode status_code);
+    std::string status_code_phrase(const StatusCode status_code);
+    enum DecodeStatusCode {
+        PENDING,
+        COMPLETE,
+        MALFORMED
+    };
+    DecodeStatusCode decode(const std::string &in, std::string &out);
+    bool path_within(const std::string &base, const std::string &path);
 }
 
 #endif

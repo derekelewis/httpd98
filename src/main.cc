@@ -14,8 +14,6 @@
 
 #define BACKLOG 4096
 
-static Configuration LoadConfiguration(const std::string &path);
-
 int main(int argc, char *argv[]) {
 
     std::string config_path;
@@ -35,7 +33,7 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    Configuration configuration = LoadConfiguration(config_path);
+    Configuration configuration = Configuration::Load(config_path);
     if (configuration.state() != Configuration::COMPLETE) {
         std::cerr << configuration.message() << "\n";
         return 1;
@@ -92,7 +90,7 @@ int main(int argc, char *argv[]) {
 
         if ((pid = fork()) == 0) {
             close(sock);
-            Worker worker;
+            Worker worker(configuration);
             worker.Execute(conn);
             // we assume Execute() handles all closes of conn before returning
             _exit(0);
@@ -107,11 +105,4 @@ int main(int argc, char *argv[]) {
     }
 
     return 0;
-}
-
-static Configuration LoadConfiguration(const std::string &path) {
-    if (!path.empty()) return Configuration::FromFile(path);
-
-    std::cout << "No configuration specified. Using default configuration.\n";
-    return Configuration::FromString("DocumentRoot .\nPort 8080\n");
 }

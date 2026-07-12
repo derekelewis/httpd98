@@ -1,6 +1,7 @@
 #include "request.h"
 #include "request_parser.h"
 #include "response.h"
+#include "static_file_handler.h"
 #include "worker.h"
 
 #include <iostream>
@@ -31,8 +32,8 @@ void Worker::Execute(int conn) {
     // TODO: return actual response
     switch (request.method()) {
         case http::GET: {
-            std::string body = "<html><body>hello, world!</body></html>";
-            Response response = Response(http::HTTP_200, body);
+            StaticFileHandler handler(configuration_.document_root());
+            Response response = handler.Handle(request);
             std::string response_string = response.serialize();
             write(conn, response_string.data(), response_string.size());
             close(conn);

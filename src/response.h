@@ -8,6 +8,7 @@
 class Response {
 public:
     Response(http::StatusCode status_code, const std::string& body) : status_code_(status_code), body_(body) {}
+    void set_header(const std::string &name, const std::string &value);
     std::string serialize() const;
 private:
     http::Headers headers_;

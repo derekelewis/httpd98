@@ -5,16 +5,16 @@
 #include <string>
 
 static void test_fromstring() {
-    std::string t = "DocumentRoot /var/www/html\nPort 80\n";
+    std::string t = "DocumentRoot /tmp\nPort 80\n";
     Configuration c = Configuration::FromString(t);
-    EXPECT_EQ_STR("/var/www/html", c.document_root());
+    EXPECT_EQ_STR("/tmp", c.document_root());
     unsigned short port = 80;
     EXPECT_TRUE(c.port() == port);
     EXPECT_TRUE(c.state() == Configuration::COMPLETE);
 }
 
 static void test_document_root_missing_key() {
-    std::string t = "/var/www/html\nPort 80";
+    std::string t = "/tmp\nPort 80";
     Configuration c = Configuration::FromString(t);
     EXPECT_TRUE(c.state() == Configuration::MALFORMED);
     EXPECT_EQ_STR("Invalid configuration: DocumentRoot not found", c.message());
@@ -28,7 +28,7 @@ static void test_document_root_missing_value() {
 }
 
 static void test_port_missing_key() {
-    std::string t = "DocumentRoot /var/www/html\n80";
+    std::string t = "DocumentRoot /tmp\n80";
     Configuration c = Configuration::FromString(t);
     EXPECT_TRUE(c.state() == Configuration::MALFORMED);
     EXPECT_EQ_STR("Invalid configuration: Port not found", c.message());

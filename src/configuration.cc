@@ -1,23 +1,33 @@
 #include "configuration.h"
+
+#include <limits.h>
 #include <iostream>
 #include <cstdlib>
 #include <fstream>
 #include <sstream>
 
-Configuration Configuration::FromFile(const std::string &path)
+Configuration Configuration::Load(const std::string &path)
 {
     Configuration configuration;
-    std::ifstream ifs(path.c_str());
+
+    if (!path.empty()) {
+        std::ifstream ifs(path.c_str());
     
-    if (!ifs) {
-        configuration.state_ = MALFORMED;
-        configuration.message_ = "Invalid configuration: bad path";
-        return configuration;
+        if (!ifs) {
+            configuration.state_ = MALFORMED;
+            configuration.message_ = "Invalid configuration: bad path";
+            return configuration;
+        }
+
+        std::ostringstream contents;
+        contents << ifs.rdbuf();
+        configuration = FromString(contents.str());
+    } else {
+        std::cout << "No configuration specified. Using default configuration.\n";
+        configuration = Configuration::FromString("DocumentRoot .\nPort 8080\n");
     }
 
-    std::ostringstream contents;
-    contents << ifs.rdbuf();
-    configuration = FromString(contents.str());
+    configuration.canonicalize_document_root();
 
     return configuration;
 }
@@ -92,4 +102,16 @@ Configuration::State Configuration::state() const
 const std::string &Configuration::message() const
 {
     return message_;
+}
+
+void Configuration::canonicalize_document_root() {
+    if (state_ != COMPLETE) return;
+
+    char out[PATH_MAX];   
+    if (realpath(document_root_.c_str(), out) == NULL) {
+        state_ = MALFORMED;
+        message_ = "Invalid configuration: DocumentRoot bad path";
+        return;
+    }
+    document_root_ = out;
 }
